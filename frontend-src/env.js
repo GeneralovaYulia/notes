@@ -1,2 +1,2 @@
-const URI = "http://localhost:3000";
+const URI = "http://yuliageneralova.ru";
 export default URI;
