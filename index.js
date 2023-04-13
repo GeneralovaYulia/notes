@@ -39,7 +39,7 @@ app.use(cookieParser());
 app.use(async (req, res, next) => {
   try {
     const client = await clientPromise;
-    req.db = client.db("notes_app");
+    req.db = client.db("default_db");
     next();
   } catch (err) {
     next(err);
