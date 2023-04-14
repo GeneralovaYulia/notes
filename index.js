@@ -6,8 +6,9 @@ const nunjucks = require("nunjucks");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const { MongoClient } = require('mongodb');
+const { ObjectId } = require("mongodb");
 const cookieParser = require("cookie-parser");
-const { createSession, deleteSession } = require('./methods/methodsDB');
+const { createSession, deleteSession, findInDataBase } = require('./methods/methodsDB');
 const { auth, authRedirect } = require('./methods/authMehods');
 const path = require('path');
 const { noteRouter } = require(path.join(__dirname, './routers/noteRouter'));
@@ -47,14 +48,28 @@ app.use(async (req, res, next) => {
 });
 app.set("view engine", "njk");
 
-app.get("/", auth(), authRedirect(), (req, res) => {
-  res.redirect("/dashboard");
+app.get("/", async (req, res) => {
+  console.log(req.cookies.sessionId)
+  const session  = req.cookies.sessionId
+  ? await findInDataBase(req.db, "sessions", { sessionId: req.cookies.sessionId }) : [null];
+
+  const user = await findInDataBase(req.db, "users", { _id: new ObjectId(session.userId) });
+  if (user) return res.redirect('/dashboard');
+
+  return res.render("index", {
+    authError: req.query.authError === 'true' ? 'Wrong username or password' : false
+  });
 });
 
-app.get("/dashboard", auth(), (req, res) => {
-  if (!req.user) return res.redirect("/");
+app.get("/dashboard", async (req, res) => {
+  const session  = await findInDataBase(req.db, "sessions", { sessionId: req.cookies.sessionId });
+  if (!session ) return;
 
-  res.render("dashboard", { username: req.user.username });
+  const user = await findInDataBase(req.db, "users", { _id: new ObjectId(session.userId) });
+
+  if (!user) return res.redirect("/");
+
+  res.render("dashboard", { username: user.username });
 });
 
 app.post("/signup", bodyParser.urlencoded({ extended: false }), async (req, res) => {
