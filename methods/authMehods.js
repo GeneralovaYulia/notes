@@ -1,5 +1,6 @@
 const { findInDataBase, pushInDatabase } = require('./methodsDB');
 const { nanoid } = require("nanoid");
+const { ObjectId } = require("mongodb");
 
 const messageAuthError = {
   errorAuth: "Ошибка авторизации!",
@@ -17,7 +18,7 @@ const auth = () => async (req, res, next) => {
     return next();
   }
 
-  const user = await findInDataBase(req.db, "users", { id: session.userId });
+  const user = await findInDataBase(req.db, "users", { _id: new ObjectId(session.userId) });
   if (!user) {
     return next();
   }
