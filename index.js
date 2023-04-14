@@ -74,7 +74,6 @@ app.post("/signup", bodyParser.urlencoded({ extended: false }), async (req, res)
 
 app.post("/login", bodyParser.urlencoded({ extended: false }), async (req, res) => {
   const { username, password } = req.body;
-  console.log(req.body)
 
   const user = await req.db.collection("users").findOne({ username });
 

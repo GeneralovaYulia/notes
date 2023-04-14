@@ -1,8 +1,5 @@
-//require('dotenv').config();
-//const URI = process.env.SERVER;
-//const PREFIX = "???";
-
-import URI from './env';
+//import URI from './env';
+const URI = "http://localhost:3000";
 
 const req = (url, options = {}) => {
   const { body } = options;
