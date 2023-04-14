@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const { MongoClient } = require('mongodb');
 const cookieParser = require("cookie-parser");
-const { createSession, deleteSession } = require('./methods/methodsDB');
+const { createSession, deleteSession, findInDataBase } = require('./methods/methodsDB');
 const { auth, authRedirect } = require('./methods/authMehods');
 const path = require('path');
 const { noteRouter } = require(path.join(__dirname, './routers/noteRouter'));
@@ -47,11 +47,25 @@ app.use(async (req, res, next) => {
 });
 app.set("view engine", "njk");
 
-app.get("/", auth(), authRedirect(), (req, res) => {
-  res.redirect("/dashboard");
+app.get("/", async (req, res) => {
+  if (!req.cookies.sessionId) {
+    return;
+  }
+
+  const session  = await findInDataBase(req.db, "sessions", { sessionId: req.cookies.sessionId });
+  if (!session ) {
+    return;
+  }
+
+  const user = await findInDataBase(req.db, "users", { id: session.userId });
+  if (user) return res.redirect("/dashboard");
+
+  return res.render("index", {
+    authError: req.query.authError === 'true' ? 'Wrong username or password' : false
+  });
 });
 
-app.get("/dashboard", auth(), (req, res) => {
+app.get("/dashboard", async (req, res) => {
   if (!req.user) return res.redirect("/");
 
   res.render("dashboard", { username: req.user.username });
