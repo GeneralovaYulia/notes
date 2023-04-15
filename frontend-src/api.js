@@ -1,5 +1,5 @@
 //import URI from './env';
-const URI = "http://yuliageneralova.ru";
+const URI = "https://yuliageneralova.ru";
 
 const req = (url, options = {}) => {
   const { body } = options;
