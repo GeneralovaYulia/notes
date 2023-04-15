@@ -54,15 +54,15 @@ const authSocial = () => async (req, res) => {
     if (user) {
       const sessionId = nanoid();
       await pushInDatabase(req.db, "sessions", { userId: user.id, id: nanoid(), sessionId });
-      res.cookie("sessionId", sessionId);
-      return res.redirect("/");
+      res.cookie("sessionId", sessionId, { httpOnly: true }).redirect("/");
+      //return res.redirect("/");
     }
     const userId = nanoid();
     await pushInDatabase(req.db, "users", { id: userId, username: req.user.username, social: req.user.social });
     const sessionId = nanoid();
     await pushInDatabase(req.db, "sessions", { userId: userId, id: nanoid(), sessionId });
-    res.cookie("sessionId", sessionId);
-    res.redirect("/");
+    res.cookie("sessionId", sessionId, { httpOnly: true }).redirect("/");
+    //res.redirect("/");
   } catch (err) {
     console.error(err);
     res.status(500).send("Ошибка на сервере");

@@ -9,7 +9,7 @@ const { MongoClient } = require('mongodb');
 const { ObjectId } = require("mongodb");
 const cookieParser = require("cookie-parser");
 const { createSession, deleteSession, findInDataBase } = require('./methods/methodsDB');
-const { auth, authRedirect } = require('./methods/authMehods');
+const { auth } = require('./methods/authMehods');
 const path = require('path');
 const { noteRouter } = require(path.join(__dirname, './routers/noteRouter'));
 const { nanoid } = require('nanoid');
@@ -49,11 +49,10 @@ app.use(async (req, res, next) => {
 app.set("view engine", "njk");
 
 app.get("/", async (req, res) => {
-  console.log(req.cookies.sessionId)
   const session = req.cookies.sessionId
   ? await findInDataBase(req.db, "sessions", { sessionId: req.cookies.sessionId }) : [null];
 
-  const user = await findInDataBase(req.db, "users", { _id: new ObjectId(session.userId) });
+  const user = session ? await findInDataBase(req.db, "users", { _id: new ObjectId(session.userId) }) : [null];
   if (user) return res.redirect('/dashboard');
 
   return res.render("index", {
@@ -62,11 +61,10 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/dashboard", async (req, res) => {
-  const session  = await findInDataBase(req.db, "sessions", { sessionId: req.cookies.sessionId });
-  if (!session ) return;
+  const session = req.cookies.sessionId
+  ? await findInDataBase(req.db, "sessions", { sessionId: req.cookies.sessionId }) : [null];
 
-  const user = await findInDataBase(req.db, "users", { _id: new ObjectId(session.userId) });
-
+  const user = session ? await findInDataBase(req.db, "users", { _id: new ObjectId(session.userId) }) : [null];
   if (!user) return res.redirect("/");
 
   res.render("dashboard", {
@@ -107,8 +105,7 @@ app.post("/login", bodyParser.urlencoded({ extended: false }), async (req, res) 
 
   const sessionId = await createSession(req.db, user._id);
 
-  res.cookie("sessionId", sessionId);
-  res.redirect("/");
+  res.cookie("sessionId", sessionId, { httpOnly: true }).redirect("/");
 });
 
 app.get("/logout", auth(), async (req, res) => {
