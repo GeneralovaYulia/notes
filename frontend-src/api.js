@@ -1,5 +1,5 @@
 //import URI from './env';
-const URI = "http://localhost:3000";
+const URI = "http://yuliageneralova.ru";
 
 const req = (url, options = {}) => {
   const { body } = options;

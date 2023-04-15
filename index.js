@@ -50,7 +50,7 @@ app.set("view engine", "njk");
 
 app.get("/", async (req, res) => {
   console.log(req.cookies.sessionId)
-  const session  = req.cookies.sessionId
+  const session = req.cookies.sessionId
   ? await findInDataBase(req.db, "sessions", { sessionId: req.cookies.sessionId }) : [null];
 
   const user = await findInDataBase(req.db, "users", { _id: new ObjectId(session.userId) });
@@ -69,7 +69,10 @@ app.get("/dashboard", async (req, res) => {
 
   if (!user) return res.redirect("/");
 
-  res.render("dashboard", { username: user.username });
+  res.render("dashboard", {
+    username: user.username,
+    dir: __dirname
+  });
 });
 
 app.post("/signup", bodyParser.urlencoded({ extended: false }), async (req, res) => {
@@ -117,7 +120,7 @@ app.get("/logout", auth(), async (req, res) => {
   res.clearCookie("sessionId").redirect("/");
 });
 
-app.use("/auth", googleRouter);
+app.use("/google", googleRouter);
 app.use("/github", githubRouter);
 app.use("/notes", noteRouter);
 

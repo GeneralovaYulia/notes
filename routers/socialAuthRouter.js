@@ -12,12 +12,13 @@ googleRouter.use(googlePassport.session());
 
 googleRouter.get("/success", authSocial());
 
-googleRouter.get('/google',
+googleRouter.get("/auth",
   googlePassport.authenticate('google', { scope: ['email', 'profile'] }));
 
-googleRouter.get('/google/callback',
-  googlePassport.authenticate('google', {
-    successRedirect: "/auth/success",
+googleRouter.get(
+  "/callback",
+  googlePassport.authenticate("google", {
+    successRedirect: "/google/success",
     failureRedirect: "/?auth=errorAuth",
   }),
 );
