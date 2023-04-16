@@ -90,6 +90,7 @@ app.post("/signup", bodyParser.urlencoded({ extended: false }), async (req, res)
 
 app.post("/login", bodyParser.urlencoded({ extended: false }), async (req, res) => {
   const { username, password } = req.body;
+  console.log(req.body)
 
   const user = await req.db.collection("users").findOne({ username });
 
@@ -113,11 +114,11 @@ app.get("/logout", auth(), async (req, res) => {
     return res.redirect("/");
   }
 
-  await deleteSession(req.db, req.sessionId);
+  await deleteSession(req.db, req.cookies.sessionId);
   res.clearCookie("sessionId").redirect("/");
 });
 
-app.use("/google", googleRouter);
+app.use("/auth", googleRouter);
 app.use("/github", githubRouter);
 app.use("/notes", noteRouter);
 

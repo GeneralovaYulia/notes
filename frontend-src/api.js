@@ -1,5 +1,8 @@
-//import URI from './env';
-const URI = "https://yuliageneralova.ru";
+//require('dotenv').config();
+//const URI = process.env.SERVER;
+//const PREFIX = "???";
+
+import URI from './env';
 
 const req = (url, options = {}) => {
   const { body } = options;
