@@ -10,10 +10,10 @@ const { ObjectId } = require("mongodb");
 const cookieParser = require("cookie-parser");
 const { createSession, deleteSession, findInDataBase } = require('./methods/methodsDB');
 const { auth } = require('./methods/authMehods');
-const path = require('path');
-const { noteRouter } = require(path.join(__dirname, './routers/noteRouter'));
+//const path = require('path');
+const { noteRouter } = require('./routers/noteRouter');
 const { nanoid } = require('nanoid');
-const { googleRouter, githubRouter } = require(path.join(__dirname,'./routers/socialAuthRouter'));
+const { googleRouter, githubRouter } = require('./routers/socialAuthRouter');
 
 const clientPromise = MongoClient.connect(process.env.DATABASE, {
   useUnifiedTopology: true,
@@ -22,12 +22,12 @@ const clientPromise = MongoClient.connect(process.env.DATABASE, {
 
 const app = express();
 
-nunjucks.configure(path.join(__dirname, "views"), {
+nunjucks.configure("views"), {
   autoescape: true,
   express: app,
-});
+};
 
-app.use(express.static(path.join(__dirname,"public")));
+app.use(express.static("public"));
 app.use(
   session(
     {
